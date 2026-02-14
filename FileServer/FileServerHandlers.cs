@@ -2,7 +2,7 @@
 using AzureFileServer.Azure;
 using AzureFileServer.Utils;
 using Microsoft.Extensions.Primitives;
-using System.Text.Json;
+using System.Text;
 
 namespace AzureFileServer.FileServer;
 
@@ -236,10 +236,11 @@ public class FileServerHandlers
                 {
                     fileStrings += metadata.ToString() + "\n";
                 }
-                response.ContentLength = fileStrings.Length;
-                response.ContentType = "text/plain";
+                response.StatusCode = 200;
+                response.ContentLength = Encoding.UTF8.GetByteCount(fileStrings);
+                response.ContentType = "text/plain; charset=utf-8";
 
-                await using (var bodyWriter = new StreamWriter(response.Body))
+                await using (var bodyWriter = new StreamWriter(response.Body, leaveOpen: true))
                 {
                     await bodyWriter.WriteAsync(fileStrings);
                     await bodyWriter.FlushAsync();
