@@ -187,6 +187,11 @@ public class FileServerHandlers
                 m = await _cosmosDbWrapper.GetItemAsync<FileMetadata>(m.id, m.userid);
                 response.ContentType = m.contenttype;
                 response.ContentLength = m.contentlength;
+                //I wasn't sure if printing to the page was sufficient, or if it should be an actual download;
+                //Went with actual download because uploadfile seems to deal in actual files, so downloadfile should too.
+                //Full disclosure, this line in particular is just AI (Grok); I asked it how to download a file
+                //via http rather than just print the response, and this was the result.
+                response.Headers.Append("Content-Disposition", $"attachment; filename=\"{Path.GetFileName(m.filename)}\"");
 
                 var blobStorage = new BlobStorageWrapper(_configuration);
                 await blobStorage.DownloadBlob(m.userid, m.filename, response.Body);
