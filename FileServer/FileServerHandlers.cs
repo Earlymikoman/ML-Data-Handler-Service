@@ -229,26 +229,32 @@ public class FileServerHandlers
                 // TODO: Implement the list files delegate to return a list of files
                 // that are associated with the userId provided in the HTTP request.
                 HttpResponse response = context.Response;
-                IEnumerable<FileMetadata> metadatas = await _cosmosDbWrapper.GetItemsAsync<FileMetadata>(m.userid);
-                if (metadatas == null)
+                //IEnumerable<FileMetadata> metadatas = await _cosmosDbWrapper.GetItemsAsync<FileMetadata>(m.userid);
+                //if (metadatas == null)
+                //{
+                 //   throw new UserErrorException();
+                //}
+                
+                string fileStrings = "";
+                m = await _cosmosDbWrapper.GetItemAsync<FileMetadata>(m.id, m.userid);
+                if (m == null)
                 {
                     throw new UserErrorException();
                 }
-                
-                string fileStrings = "";
-                foreach (FileMetadata metadata in metadatas)
-                {
-                    fileStrings += metadata.ToString() + "\n";
-                }
-                response.StatusCode = 200;
-                //response.ContentLength = Encoding.UTF8.GetByteCount(fileStrings);
-                //response.ContentType = "text/plain; charset=utf-8";
-
-                //await using (var bodyWriter = new StreamWriter(response.Body, leaveOpen: true))
+                fileStrings = m.ToString();
+                //foreach (FileMetadata metadata in metadatas)
                 //{
-                //    await bodyWriter.WriteAsync(fileStrings);
-                //   await bodyWriter.FlushAsync();
+                //    fileStrings += metadata.ToString() + "\n";
                 //}
+                response.StatusCode = 200;
+                response.ContentLength = Encoding.UTF8.GetByteCount(fileStrings);
+                response.ContentType = "text/plain; charset=utf-8";
+
+                await using (var bodyWriter = new StreamWriter(response.Body, leaveOpen: true))
+                {
+                    await bodyWriter.WriteAsync(fileStrings);
+                    await bodyWriter.FlushAsync();
+                }
             }
             catch (UserErrorException e)
             {
