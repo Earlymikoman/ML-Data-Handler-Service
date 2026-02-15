@@ -291,11 +291,8 @@ public class FileServerHandlers
                 //Failure to find the file to be deleted will be logged, but not considered a failure state.
                 //I don't know what would cause "Terminal Failure" to show, but I know it would indeed be terminal, so that's what the default value gets to be.
                 string deletionStatus = "Terminal Failure";
-                //We swap to using the found metadata from here so as to make sure the names are properly synced (capitalization)
-                FileMetadata foundMetadata = await _cosmosDbWrapper.GetItemAsync<FileMetadata>(m.id, m.userid);
-                if (foundMetadata != null)
+                if (await _cosmosDbWrapper.GetItemAsync<FileMetadata>(m.id, m.userid) != null)
                 {
-                    m = foundMetadata;
                     await _cosmosDbWrapper.DeleteItemAsync(m.id, m.userid);
                     deletionStatus = "File Found And Deleted";
                 }
