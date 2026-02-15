@@ -225,29 +225,22 @@ public class FileServerHandlers
 
                 FileMetadata m = new FileMetadata();
                 m.userid = GetParameterFromList("userid", request, log);
-                
-                m.filename = GetParameterFromList("filename", request, log);
 
                 // TODO: Implement the list files delegate to return a list of files
                 // that are associated with the userId provided in the HTTP request.
                 HttpResponse response = context.Response;
-                //IEnumerable<FileMetadata> metadatas = await _cosmosDbWrapper.GetItemsAsync<FileMetadata>(m.userid);
-                //if (metadatas == null)
-                //{
-                 //   throw new UserErrorException();
-                //}
-                
-                string fileStrings = "";
-                m = await _cosmosDbWrapper.GetItemAsync<FileMetadata>(m.id, m.userid);
-                if (m == null)
+                string query = $"SELECT * FROM c WHERE c.userid = \"{m.userid}\"";
+                IEnumerable<FileMetadata> metadatas = await _cosmosDbWrapper.GetItemsAsync<FileMetadata>(query);
+                if (metadatas == null)
                 {
                     throw new UserErrorException();
                 }
-                fileStrings = m.ToString();
-                //foreach (FileMetadata metadata in metadatas)
-                //{
-                //    fileStrings += metadata.ToString() + "\n";
-                //}
+                
+                string fileStrings = "";
+                foreach (FileMetadata metadata in metadatas)
+                {
+                    fileStrings += metadata.ToString() + "\n";
+                }
                 response.StatusCode = 200;
                 response.ContentLength = Encoding.UTF8.GetByteCount(fileStrings);
                 response.ContentType = "text/plain; charset=utf-8";
