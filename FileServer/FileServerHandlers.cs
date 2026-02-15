@@ -238,10 +238,10 @@ public class FileServerHandlers
                     throw new UserErrorException();
                 }
                 
-                string fileStrings = "";
+                string fileStrings = metadatas.Count() + "Files Found:\n";
                 foreach (FileMetadata metadata in metadatas)
                 {
-                    fileStrings += metadata.ToString() + "\n";
+                    fileStrings += "\t" + metadata.ToString() + "\n";
                 }
                 response.StatusCode = 200;
                 response.ContentLength = Encoding.UTF8.GetByteCount(fileStrings);
