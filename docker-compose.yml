@@ -3,8 +3,8 @@
 version: '3.4'
 
 services:
-  azure-file-server:
-    image: azure-file-server
+  mr-xometry-job-handler:
+    image: mr-xometry-job-handler
     build:
       context: .
       dockerfile: ./Dockerfile
