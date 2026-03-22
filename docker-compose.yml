@@ -3,8 +3,8 @@
 version: '3.4'
 
 services:
-  mr-xometry-job-handler:
-    image: mr-xometry-job-handler
+  ml-data-handler:
+    image: ml-data-handler
     build:
       context: .
       dockerfile: ./Dockerfile
