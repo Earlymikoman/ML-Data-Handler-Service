@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "RrkwImCwGLIarhCckz/0Vj4uEwbM7ze5qHqfEA2TS5bZNqYUlHQ4kpLEOuUqE8lOu5e5S5iECaDZC8OlrZrKwA==",
+  "dgSpecHash": "+2/Hi83qLnevM3lQfH4LgZ3qs3lT5v142mBYXS4D3bWyNidCsdyG8mmpZ4ZJYxlxrOKLsj8kYWdT+/5Ff0ea8w==",
   "success": true,
-  "projectFilePath": "/home/earlymikoman/assignment-6-azure-file-server-Earlymikoman/azure-file-server.csproj",
+  "projectFilePath": "/home/earlymikoman/ML-Data-Handler-Service/azure-file-server.csproj",
   "expectedPackageFiles": [
     "/home/earlymikoman/.nuget/packages/azure.core/1.39.0/azure.core.1.39.0.nupkg.sha512",
     "/home/earlymikoman/.nuget/packages/azure.identity/1.11.4/azure.identity.1.11.4.nupkg.sha512",

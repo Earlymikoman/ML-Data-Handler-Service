@@ -76,32 +76,6 @@ public class FileServerHandlers
         }
     }
 
-    public async Task XometryDelegate(HttpContext context)
-    {
-        using (var log = _logger.StartMethod(nameof(XometryDelegate), context))
-        {
-            try
-            {
-                HttpRequest request = context.Request;
-                string data = "";
-
-                using (var streamReader = new StreamReader(request.Body))
-                {
-                    data = await streamReader.ReadToEndAsync();
-                }
-
-                await context.Response.WriteAsync(data);
-            }
-            catch(Exception e)
-            {
-                // While you can just throw the exception back to the web server,
-                // it is not recommended. It is better to catch the exception and
-                // log it, then return a 500 Internal Server Error to the caller yourself.
-                log.HandleException(e);
-            }
-        }
-    }
-
     // Health Checks (aka ping) methods are handy to have on your service
     // They allow you to report that your are alive and return any other
     // information that is useful. These are often used by load balancers
@@ -134,9 +108,9 @@ public class FileServerHandlers
         }
     }
 
-    public async Task UploadFileDelegate(HttpContext context)
+    public async Task UploadDataDelegate(HttpContext context)
     {
-        using(var log = _logger.StartMethod(nameof(UploadFileDelegate), context))
+        using(var log = _logger.StartMethod(nameof(UploadDataDelegate), context))
         {
             try
             {
@@ -148,28 +122,26 @@ public class FileServerHandlers
                     throw new UserErrorException("No file content found");
                 }
 
-                FileMetadata m = new FileMetadata();
+                DataMetadata m = new DataMetadata();
                 m.userid = GetParameterFromList("userid", request, log);
-                m.filename = fileContent.FileName;
+                m.sourceprompt = GetParameterFromList("sourceprompt", request, log);
                 m.contenttype = fileContent.ContentType;
                 m.contentlength = fileContent.Length; 
 
-                m.filename = Path.ChangeExtension(Path.GetFileNameWithoutExtension(m.filename), Path.GetExtension(m.filename).ToLowerInvariant());               
-
-                log.SetAttribute("request.filename", m.filename);
+                log.SetAttribute("request.sourceprompt", m.sourceprompt);
                 log.SetAttribute("request.contenttype", m.contenttype);
                 log.SetAttribute("request.contentlength", m.contentlength);
 
                 // First step is we will write the metadata to CosmosDB
                 // Here we are using Type mapping to convert our data structure
                 // to a JSON document that can be stored in CosmosDB.
-                if (await _cosmosDbWrapper.GetItemAsync<FileMetadata>(m.id, m.userid) != null)
+                if (await _cosmosDbWrapper.GetItemAsync<DataMetadata>(m.id, m.sourceprompt) != null)
                 {
-                    await _cosmosDbWrapper.UpdateItemAsync(m.id, m.userid, m);
+                    await _cosmosDbWrapper.UpdateItemAsync(m.id, m.sourceprompt, m);
                 }
                 else
                 {
-                    await _cosmosDbWrapper.AddItemAsync(m, m.userid);
+                    await _cosmosDbWrapper.AddItemAsync(m, m.sourceprompt);
                 }
 
                 // Now we write the file into a blob storage element within the container.
@@ -177,7 +149,7 @@ public class FileServerHandlers
                 var blobStorage = new BlobStorageWrapper(_configuration);
                 using (var streamReader = new StreamReader(fileContent.OpenReadStream()))
                 {
-                    await blobStorage.WriteBlob(m.userid, m.filename, streamReader.BaseStream);
+                    await blobStorage.WriteBlob(m.sourceprompt, m.userid, streamReader.BaseStream);
                 }
 
                 // The POST has no response body, so we just return and the system
@@ -194,29 +166,27 @@ public class FileServerHandlers
         }
     }
 
-    public async Task DownloadFileDelegate(HttpContext context)
+    public async Task GetDataDelegate(HttpContext context)
     {
-        using(var log = _logger.StartMethod(nameof(DownloadFileDelegate), context))
+        using(var log = _logger.StartMethod(nameof(GetDataDelegate), context))
         {
             try
             {
                 HttpRequest request = context.Request;
 
-                FileMetadata m = new FileMetadata();
+                DataMetadata m = new DataMetadata();
                 m.userid = GetParameterFromList("userid", request, log);
-                m.filename = GetParameterFromList("filename", request, log);
+                m.sourceprompt = GetParameterFromList("sourceprompt", request, log);
 
-                m.filename = Path.ChangeExtension(Path.GetFileNameWithoutExtension(m.filename), Path.GetExtension(m.filename).ToLowerInvariant());
-
-                log.SetAttribute("request.filename", m.filename);
+                log.SetAttribute("request.sourceprompt", m.sourceprompt);
 
                 // TODO: Implement the download file delegate to return the file
                 // contents to the caller via the HTTP response after receiving both
-                // the userId and the filename to find.
+                // the userId and the sourceprompt to find.
 
                 HttpResponse response = context.Response;
                 //If this fails, should throw a UserErrorException FileNotFound (404)
-                m = await _cosmosDbWrapper.GetItemAsync<FileMetadata>(m.id, m.userid);
+                m = await _cosmosDbWrapper.GetItemAsync<DataMetadata>(m.id, m.sourceprompt);
                 if (m == null)
                 {
                     throw new UserErrorException();
@@ -227,10 +197,10 @@ public class FileServerHandlers
                 //Went with actual download because uploadfile seems to deal in actual files, so downloadfile should too.
                 //Full disclosure, this line in particular is just AI (Grok); I asked it how to download a file
                 //via http rather than just print the response, and this was the result.
-                response.Headers.Append("Content-Disposition", $"attachment; filename=\"{Path.GetFileName(m.filename)}\"");
+                response.Headers.Append("Content-Disposition", $"attachment; sourceprompt=\"{m.sourceprompt}\"");
 
                 var blobStorage = new BlobStorageWrapper(_configuration);
-                await blobStorage.DownloadBlob(m.userid, m.filename, response.Body);
+                await blobStorage.DownloadBlob(m.sourceprompt, m.userid, response.Body);
 
                 log.SetAttribute("response.contenttype", response.ContentType);
                 log.SetAttribute("response.contentlength", response.ContentLength);
@@ -247,29 +217,36 @@ public class FileServerHandlers
         }
     }
 
-    public async Task ListFilesDelegate(HttpContext context)
+    public async Task ListDataDelegate(HttpContext context)
     {
-        using(var log = _logger.StartMethod(nameof(ListFilesDelegate), context))
+        using(var log = _logger.StartMethod(nameof(ListDataDelegate), context))
         {
             try
             {
                 HttpRequest request = context.Request;
 
-                FileMetadata m = new FileMetadata();
-                m.userid = GetParameterFromList("userid", request, log);
+                string sorttype = GetParameterFromList("sorttype", request, log);
+                string partitionstring = "";
+                if (sorttype == "sourceprompt")
+                {
+                    partitionstring = GetParameterFromList("sourceprompt", request, log);
+                }else if (sorttype == "userid")
+                {
+                    partitionstring = GetParameterFromList("userid", request, log);
+                }
 
                 // TODO: Implement the list files delegate to return a list of files
                 // that are associated with the userId provided in the HTTP request.
                 HttpResponse response = context.Response;
-                string query = $"SELECT * FROM c WHERE c.userid = \"{m.userid}\"";
-                IEnumerable<FileMetadata> metadatas = await _cosmosDbWrapper.GetItemsAsync<FileMetadata>(query);
+                string query = $"SELECT * FROM c WHERE c.{sorttype} = \"{partitionstring}\"";
+                IEnumerable<DataMetadata> metadatas = await _cosmosDbWrapper.GetItemsAsync<DataMetadata>(query);
                 if (metadatas == null)
                 {
                     throw new UserErrorException();
                 }
                 
-                string fileStrings = metadatas.Count() + " Files Found:\n";
-                foreach (FileMetadata metadata in metadatas)
+                string fileStrings = metadatas.Count() + " Data Found:\n";
+                foreach (DataMetadata metadata in metadatas)
                 {
                     fileStrings += "\t" + metadata.ToString() + "\n";
                 }
@@ -298,28 +275,26 @@ public class FileServerHandlers
         }
     }
 
-    public async Task DeleteFileDelegate(HttpContext context)
+    public async Task DeleteDataDelegate(HttpContext context)
     {
-        using(var log = _logger.StartMethod(nameof(DeleteFileDelegate), context))
+        using(var log = _logger.StartMethod(nameof(DeleteDataDelegate), context))
         {
             try
             {
                 HttpRequest request = context.Request;
 
-                FileMetadata m = new FileMetadata();
+                DataMetadata m = new DataMetadata();
                 m.userid = GetParameterFromList("userid", request, log);
-                m.filename = GetParameterFromList("filename", request, log);
-
-                m.filename = Path.ChangeExtension(Path.GetFileNameWithoutExtension(m.filename), Path.GetExtension(m.filename).ToLowerInvariant());
+                m.sourceprompt = GetParameterFromList("sourceprompt", request, log);
 
                 // TODO: Implement the delete file delegate to remove the file
                 // from the storage system and the metadata from the CosmosDB database.
                 //Failure to find the file to be deleted will be logged, but not considered a failure state.
                 //I don't know what would cause "Terminal Failure" to show, but I know it would indeed be terminal, so that's what the default value gets to be.
                 string deletionStatus = "Terminal Failure";
-                if (await _cosmosDbWrapper.GetItemAsync<FileMetadata>(m.id, m.userid) != null)
+                if (await _cosmosDbWrapper.GetItemAsync<DataMetadata>(m.id, m.sourceprompt) != null)
                 {
-                    await _cosmosDbWrapper.DeleteItemAsync(m.id, m.userid);
+                    await _cosmosDbWrapper.DeleteItemAsync(m.id, m.sourceprompt);
                     deletionStatus = "File Found And Deleted";
                 }
                 else
@@ -330,16 +305,16 @@ public class FileServerHandlers
                 log.SetAttribute("deletion.status", deletionStatus);
 
                 var blobStorage = new BlobStorageWrapper(_configuration);
-                await blobStorage.DeleteBlob(m.userid, m.filename);
+                await blobStorage.DeleteBlob(m.sourceprompt, m.userid);
 
                 HttpResponse response = context.Response;
                 response.StatusCode = 200;
-                response.ContentLength = Encoding.UTF8.GetByteCount(deletionStatus + ": " + m.filename);
+                response.ContentLength = Encoding.UTF8.GetByteCount(deletionStatus + ": " + m.sourceprompt);
                 response.ContentType = "text/plain; charset=utf-8";
 
                 await using (var bodyWriter = new StreamWriter(response.Body, leaveOpen: true))
                 {
-                    await bodyWriter.WriteAsync(deletionStatus + ": " + m.filename);
+                    await bodyWriter.WriteAsync(deletionStatus + ": " + m.sourceprompt);
                     await bodyWriter.FlushAsync();
                 }
             }
