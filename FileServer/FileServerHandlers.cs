@@ -124,7 +124,7 @@ public class FileServerHandlers
 
                 DataMetadata m = new DataMetadata();
                 m.userid = GetParameterFromList("userid", request, log);
-                m.sourceprompt = GetParameterFromList("sourceprompt", request, log);
+                m.sourceprompt = GetParameterFromList("sourceprompt", request, log).ToLowerInvariant();
                 m.contenttype = fileContent.ContentType;
                 m.contentlength = fileContent.Length; 
 
