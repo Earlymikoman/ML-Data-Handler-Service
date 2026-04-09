@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("azure-file-server")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d0f5c92a88ab50a31f4b4eb8f31a482c3b178245")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3954177b67860d9d6acc39e7b8f37d24cd9ec3f8")]
 [assembly: System.Reflection.AssemblyProductAttribute("azure-file-server")]
 [assembly: System.Reflection.AssemblyTitleAttribute("azure-file-server")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

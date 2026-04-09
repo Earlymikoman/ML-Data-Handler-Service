@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "+2/Hi83qLnevM3lQfH4LgZ3qs3lT5v142mBYXS4D3bWyNidCsdyG8mmpZ4ZJYxlxrOKLsj8kYWdT+/5Ff0ea8w==",
+  "dgSpecHash": "uZNrSLKiBKBLGc9LX2oax2Hc5+aQiEm78RglRAaLzGE1MtEzbEZr5RbUFGWPl+vjTkbLGzVTEd2x2Nb7yUT92g==",
   "success": true,
   "projectFilePath": "/home/earlymikoman/ML-Data-Handler-Service/azure-file-server.csproj",
   "expectedPackageFiles": [
