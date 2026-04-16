@@ -59,6 +59,7 @@ class Program
         app.MapGet("/healthcheck", instance.HealthCheckDelegate);
         app.MapGet("/getdata", instance.GetDataDelegate);
         app.MapGet("/listdata", instance.ListDataDelegate);
+        app.MapGet("/getallresponses", instance.GetAllResponsesDelegate);
         app.MapGet("/deletedata", instance.DeleteDataDelegate);   
         app.MapPost("/uploaddata", instance.UploadDataDelegate);
 

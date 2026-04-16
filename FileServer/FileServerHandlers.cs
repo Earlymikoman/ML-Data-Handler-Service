@@ -245,20 +245,66 @@ public class FileServerHandlers
                     throw new UserErrorException();
                 }
                 
-                string fileStrings = metadatas.Count() + " Data Found:\n";
-                foreach (DataMetadata metadata in metadatas)
-                {
-                    fileStrings += "\t" + metadata.ToString() + "\n";
-                }
-                response.StatusCode = 200;
-                response.ContentLength = Encoding.UTF8.GetByteCount(fileStrings);
-                response.ContentType = "text/plain; charset=utf-8";
+                await response.WriteAsJsonAsync(metadatas);
 
-                await using (var bodyWriter = new StreamWriter(response.Body, leaveOpen: true))
+                log.SetAttribute("response.contenttype", response.ContentType);
+                //log.SetAttribute("response.contentlength", response.ContentLength);
+                log.SetAttribute("response.content", response.Body);
+            }
+            catch (UserErrorException e)
+            {
+                log.LogUserError(e.Message);
+            }
+            catch(Exception e)
+            {
+                log.HandleException(e);
+            }
+        }
+    }
+
+    public async Task GetAllResponsesDelegate(HttpContext context)
+    {
+        using(var log = _logger.StartMethod(nameof(GetAllResponsesDelegate), context))
+        {
+            try
+            {
+                HttpRequest request = context.Request;
+
+                string sorttype = GetParameterFromList("sorttype", request, log);
+                string partitionstring = "";
+                if (sorttype == "sourceprompt")
                 {
-                    await bodyWriter.WriteAsync(fileStrings);
-                    await bodyWriter.FlushAsync();
+                    partitionstring = GetParameterFromList("sourceprompt", request, log);
+                }else if (sorttype == "userid")
+                {
+                    partitionstring = GetParameterFromList("userid", request, log);
                 }
+
+                // TODO: Implement the list files delegate to return a list of files
+                // that are associated with the userId provided in the HTTP request.
+                HttpResponse response = context.Response;
+                string query = $"SELECT * FROM c WHERE c.{sorttype} = \"{partitionstring}\"";
+                IEnumerable<DataMetadata> metadatas = await _cosmosDbWrapper.GetItemsAsync<DataMetadata>(query);
+                if (metadatas == null)
+                {
+                    throw new UserErrorException();
+                }
+                
+                response.Headers.Append("Content-Disposition", $"attachment; filename=\"{partitionstring}_responses.json\"");
+
+                var responses = new List<object>();
+                var blobStorage = new BlobStorageWrapper(_configuration);
+                foreach (var metadata in metadatas)
+                {
+                    using var stream = new MemoryStream();
+                    await blobStorage.DownloadBlob(metadata.sourceprompt, metadata.userid, stream);
+                    stream.Position = 0;
+
+                    using var streamreader = new StreamReader(stream);
+                    responses.Add(await streamreader.ReadToEndAsync());
+                }
+
+                await response.WriteAsJsonAsync(responses);
 
                 log.SetAttribute("response.contenttype", response.ContentType);
                 log.SetAttribute("response.contentlength", response.ContentLength);
