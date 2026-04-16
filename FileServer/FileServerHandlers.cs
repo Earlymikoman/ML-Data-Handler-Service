@@ -289,7 +289,8 @@ public class FileServerHandlers
                     stream.Position = 0;
 
                     using var streamreader = new StreamReader(stream);
-                    responses.Add(await streamreader.ReadToEndAsync());
+                    string blobdata = await streamreader.ReadToEndAsync();
+                    responses.Add(new {SourcePrompt=metadata.sourceprompt, SourceUser=metadata.userid, Response=blobdata});
                 }
 
                 await response.WriteAsJsonAsync(responses);
