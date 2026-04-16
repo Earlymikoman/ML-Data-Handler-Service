@@ -14,7 +14,9 @@ public class DataMetadata
     public string id { get { return GenerateId(); } }
 
     public string userid { get; set; } = string.Empty;
-    public string sourceprompt { get; set; } = string.Empty;
+    public string sourceprompt { get { return prompttype + "-" + promptname; } }
+    public string prompttype = string.Empty;
+    public string promptname = string.Empty;
     public string contenttype { get; set; } = string.Empty;
     public long contentlength { get; set; } = 0;
 

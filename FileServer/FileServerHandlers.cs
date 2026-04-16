@@ -124,7 +124,8 @@ public class FileServerHandlers
 
                 DataMetadata m = new DataMetadata();
                 m.userid = GetParameterFromList("userid", request, log);
-                m.sourceprompt = GetParameterFromList("sourceprompt", request, log).ToLowerInvariant();
+                m.prompttype = GetParameterFromList("prompttype", request, log).ToLowerInvariant();
+                m.promptname = GetParameterFromList("promptname", request, log).ToLowerInvariant();
                 m.contenttype = fileContent.ContentType;
                 m.contentlength = fileContent.Length; 
 
@@ -176,7 +177,8 @@ public class FileServerHandlers
 
                 DataMetadata m = new DataMetadata();
                 m.userid = GetParameterFromList("userid", request, log);
-                m.sourceprompt = GetParameterFromList("sourceprompt", request, log);
+                m.prompttype = GetParameterFromList("prompttype", request, log).ToLowerInvariant();
+                m.promptname = GetParameterFromList("promptname", request, log).ToLowerInvariant();
 
                 log.SetAttribute("request.sourceprompt", m.sourceprompt);
 
@@ -226,14 +228,7 @@ public class FileServerHandlers
                 HttpRequest request = context.Request;
 
                 string sorttype = GetParameterFromList("sorttype", request, log);
-                string partitionstring = "";
-                if (sorttype == "sourceprompt")
-                {
-                    partitionstring = GetParameterFromList("sourceprompt", request, log);
-                }else if (sorttype == "userid")
-                {
-                    partitionstring = GetParameterFromList("userid", request, log);
-                }
+                string partitionstring = GetParameterFromList(sorttype, request, log);
 
                 // TODO: Implement the list files delegate to return a list of files
                 // that are associated with the userId provided in the HTTP request.
@@ -271,14 +266,7 @@ public class FileServerHandlers
                 HttpRequest request = context.Request;
 
                 string sorttype = GetParameterFromList("sorttype", request, log);
-                string partitionstring = "";
-                if (sorttype == "sourceprompt")
-                {
-                    partitionstring = GetParameterFromList("sourceprompt", request, log);
-                }else if (sorttype == "userid")
-                {
-                    partitionstring = GetParameterFromList("userid", request, log);
-                }
+                string partitionstring = GetParameterFromList(sorttype, request, log);
 
                 // TODO: Implement the list files delegate to return a list of files
                 // that are associated with the userId provided in the HTTP request.
@@ -331,7 +319,8 @@ public class FileServerHandlers
 
                 DataMetadata m = new DataMetadata();
                 m.userid = GetParameterFromList("userid", request, log);
-                m.sourceprompt = GetParameterFromList("sourceprompt", request, log);
+                m.prompttype = GetParameterFromList("prompttype", request, log).ToLowerInvariant();
+                m.promptname = GetParameterFromList("promptname", request, log).ToLowerInvariant();
 
                 // TODO: Implement the delete file delegate to remove the file
                 // from the storage system and the metadata from the CosmosDB database.
