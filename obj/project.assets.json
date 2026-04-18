@@ -2398,9 +2398,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/earlymikoman/ML-Data-Handler-Service/azure-file-server.csproj",
-      "projectName": "azure-file-server",
-      "projectPath": "/home/earlymikoman/ML-Data-Handler-Service/azure-file-server.csproj",
+      "projectUniqueName": "/home/earlymikoman/ML-Data-Handler-Service/ml-data-handler.csproj",
+      "projectName": "ml-data-handler",
+      "projectPath": "/home/earlymikoman/ML-Data-Handler-Service/ml-data-handler.csproj",
       "packagesPath": "/home/earlymikoman/.nuget/packages/",
       "outputPath": "/home/earlymikoman/ML-Data-Handler-Service/obj/",
       "projectStyle": "PackageReference",

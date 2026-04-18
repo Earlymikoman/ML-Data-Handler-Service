@@ -2,7 +2,7 @@
   "version": 2,
   "dgSpecHash": "uZNrSLKiBKBLGc9LX2oax2Hc5+aQiEm78RglRAaLzGE1MtEzbEZr5RbUFGWPl+vjTkbLGzVTEd2x2Nb7yUT92g==",
   "success": true,
-  "projectFilePath": "/home/earlymikoman/ML-Data-Handler-Service/azure-file-server.csproj",
+  "projectFilePath": "/home/earlymikoman/ML-Data-Handler-Service/ml-data-handler.csproj",
   "expectedPackageFiles": [
     "/home/earlymikoman/.nuget/packages/azure.core/1.39.0/azure.core.1.39.0.nupkg.sha512",
     "/home/earlymikoman/.nuget/packages/azure.identity/1.11.4/azure.identity.1.11.4.nupkg.sha512",
