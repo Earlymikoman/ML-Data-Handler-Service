@@ -216,8 +216,9 @@ public class DataHandlerHandlers
 
                     using var streamreader = new StreamReader(stream);
                     string blobdata = await streamreader.ReadToEndAsync();
+                    var responsedata = new {SourcePrompt=m.sourceprompt, SourceUser=m.userid, Response=blobdata};
 
-                await response.WriteAsJsonAsync(blobdata);
+                    await response.WriteAsJsonAsync(responsedata);
 
                 log.SetAttribute("response.contenttype", response.ContentType);
                 log.SetAttribute("response.contentlength", response.ContentLength);
