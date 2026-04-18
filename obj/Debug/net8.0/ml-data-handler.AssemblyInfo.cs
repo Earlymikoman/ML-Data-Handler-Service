@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ml-data-handler")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b8cbcfa90cee1f9d93b746af09877b1815fda1e9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+567cd2025052c041832407e18b0c54f142a75f36")]
 [assembly: System.Reflection.AssemblyProductAttribute("ml-data-handler")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ml-data-handler")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

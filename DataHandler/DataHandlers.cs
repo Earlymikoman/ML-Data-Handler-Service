@@ -209,7 +209,15 @@ public class DataHandlerHandlers
                 response.Headers.Append("Content-Disposition", $"attachment; sourceprompt=\"{m.sourceprompt}\"");
 
                 var blobStorage = new BlobStorageWrapper(_configuration);
-                await blobStorage.DownloadBlob(m.sourceprompt, m.userid, response.Body);
+                
+                using var stream = new MemoryStream();
+                    await blobStorage.DownloadBlob(m.sourceprompt, m.userid, stream);
+                    stream.Position = 0;
+
+                    using var streamreader = new StreamReader(stream);
+                    string blobdata = await streamreader.ReadToEndAsync();
+
+                await response.WriteAsJsonAsync(blobdata);
 
                 log.SetAttribute("response.contenttype", response.ContentType);
                 log.SetAttribute("response.contentlength", response.ContentLength);
@@ -291,6 +299,7 @@ public class DataHandlerHandlers
                 var blobStorage = new BlobStorageWrapper(_configuration);
                 foreach (var metadata in metadatas)
                 {
+                    //Grok, what the heck is this stream nonsense? Like, gimme a damn string.
                     using var stream = new MemoryStream();
                     await blobStorage.DownloadBlob(metadata.sourceprompt, metadata.userid, stream);
                     stream.Position = 0;
