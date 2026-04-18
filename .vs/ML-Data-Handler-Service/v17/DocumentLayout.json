@@ -80,7 +80,7 @@
               "RelativeDocumentMoniker": "Program.cs",
               "ToolTip": "C:\\Users\\Xander.DESKTOP-D3VRDR2\\source\\repos\\Earlymikoman\\ML-Data-Handler-Service\\Program.cs",
               "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAACgAAAAAAAAAAAAlwDsAAAAeAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAeAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-29T17:22:07.873Z",
               "EditorCaption": ""
@@ -95,7 +95,8 @@
               "RelativeToolTip": "FileServer\\FileServerHandlers.cs",
               "ViewState": "AgIAACkAAAAAAAAAAAAlwG4AAAAgAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-22T22:35:52.183Z"
+              "WhenOpened": "2026-03-22T22:35:52.183Z",
+              "EditorCaption": ""
             }
           ]
         }
