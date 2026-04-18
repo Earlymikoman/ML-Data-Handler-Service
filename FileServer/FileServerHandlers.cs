@@ -1,21 +1,21 @@
 
-using AzureFileServer.Azure;
-using AzureFileServer.Utils;
+using MLDataHandler.Azure;
+using MLDataHandler.Utils;
 using Microsoft.Extensions.Primitives;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
 
-namespace AzureFileServer.FileServer;
+namespace MLDataHandler.DataHandler;
 
 // This is the core logic of the web server and hosts all of the HTTP
 // handlers used by the web server regarding File Server functionality.
-public class FileServerHandlers
+public class DataHandlerHandlers
 {
     private readonly IConfiguration _configuration;
     private readonly Logger _logger;
     private readonly CosmosDbWrapper _cosmosDbWrapper;
 
-    public FileServerHandlers(IConfiguration configuration)
+    public DataHandlerHandlers(IConfiguration configuration)
     {
         _configuration = configuration;
         if (null == _configuration)
